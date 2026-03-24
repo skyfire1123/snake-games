@@ -7,6 +7,7 @@ signal food_spawned(position: Vector2i)
 
 const GRID_SIZE := 20
 const CELL_SIZE := 32
+const GRID_OFFSET := Vector2(0, 40)
 
 enum FoodType { NORMAL, GOLD, BLUE, TIMED }
 
@@ -84,8 +85,8 @@ func _setup_sprite(food_type: FoodType) -> void:
 		_sprite.position = Vector2.ZERO
 
 func _update_position() -> void:
-	position = Vector2(_grid_position.x * CELL_SIZE + CELL_SIZE / 2, 
-					   _grid_position.y * CELL_SIZE + CELL_SIZE / 2)
+	position = Vector2(_grid_position.x * CELL_SIZE + CELL_SIZE / 2,
+					   _grid_position.y * CELL_SIZE + CELL_SIZE / 2) + GRID_OFFSET
 	# Adjust sprite positions to center them
 	if _sprite and is_instance_valid(_sprite):
 		_sprite.position = -Vector2(CELL_SIZE / 2, CELL_SIZE / 2)

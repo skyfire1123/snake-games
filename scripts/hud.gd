@@ -16,14 +16,15 @@ var _restart_hint: Label
 var _level_clear_label: Label
 
 func _ready() -> void:
+	var hbox := $VBoxContainer/HBoxContainer
+	_score_label      = hbox.get_node_or_null("ScoreLabel")
+	_length_label     = hbox.get_node_or_null("LengthLabel")
+	_level_label      = hbox.get_node_or_null("LevelLabel")
+	_mode_label       = hbox.get_node_or_null("ModeLabel")
+	_high_score_label = hbox.get_node_or_null("HighScoreLabel")
+	_timer_label      = hbox.get_node_or_null("TimerLabel")
+	_steps_label      = hbox.get_node_or_null("StepsLabel")
 	var vbox := $VBoxContainer
-	_score_label      = vbox.get_node_or_null("ScoreLabel")
-	_length_label     = vbox.get_node_or_null("LengthLabel")
-	_level_label      = vbox.get_node_or_null("LevelLabel")
-	_mode_label       = vbox.get_node_or_null("ModeLabel")
-	_high_score_label = vbox.get_node_or_null("HighScoreLabel")
-	_timer_label      = vbox.get_node_or_null("TimerLabel")
-	_steps_label      = vbox.get_node_or_null("StepsLabel")
 	_game_over_label  = vbox.get_node_or_null("GameOverLabel")
 	_restart_hint     = vbox.get_node_or_null("RestartHint")
 	_level_clear_label = vbox.get_node_or_null("LevelClearLabel")

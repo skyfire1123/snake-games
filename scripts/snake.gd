@@ -145,8 +145,10 @@ func get_head_position() -> Vector2i:
 func get_head_sprite() -> Sprite2D:
 	return _head_sprite
 
+const GRID_OFFSET := Vector2(0, 40)
+
 func _update_segment_position(sprite: Sprite2D, grid_pos: Vector2i) -> void:
-	var world_pos := Vector2(grid_pos.x * CELL_SIZE, grid_pos.y * CELL_SIZE)
+	var world_pos := Vector2(grid_pos.x * CELL_SIZE, grid_pos.y * CELL_SIZE) + GRID_OFFSET
 	sprite.position = world_pos
 
 func _get_texture_for_segment(index: int) -> Texture2D:

@@ -50,11 +50,12 @@ var _shake_intensity := 0.0
 var _original_camera_offset := Vector2.ZERO
 
 func _ready() -> void:
-	_setup_game()
+	pass
 
 func _process(delta: float) -> void:
 	# Phase 3: screen shake
 	if _shake_duration > 0:
+		_process_shake()
 		_shake_duration -= delta
 		if _shake_duration <= 0:
 			_reset_camera()
@@ -233,6 +234,10 @@ func _on_move_timer_timeout() -> void:
 	_input_handler.set_current_direction(new_direction)
 	_update_occupied_cells()
 
+	# Grid-based food collision check
+	if new_head_pos == _food.get_grid_position():
+		_on_food_eaten()
+
 	# Challenge step tracking
 	if _game_mode == GameMode.CHALLENGE and _challenge_type == ChallengeType.STEP_LIMIT:
 		_challenge_steps_remaining -= 1
@@ -251,7 +256,7 @@ func _trigger_game_over() -> void:
 		_hud.update_high_score(_high_score)
 	
 	# Phase 3: spawn death particles at snake head
-	var head_pos := _snake.get_head_position()
+	var head_pos: Vector2i = _snake.get_head_position()
 	var head_world_pos := Vector2(head_pos.x * CELL_SIZE + CELL_SIZE / 2, head_pos.y * CELL_SIZE + CELL_SIZE / 2)
 	_particle_system.spawn_death_effect(head_world_pos)
 	

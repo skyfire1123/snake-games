@@ -1,0 +1,9 @@
+res://scenes/food.tscn
+res://scenes/hud.tscn
+res://scenes/main.tscn
+res://scripts/food.gd
+res://scripts/input_handler.gd
+res://scripts/main.gd
+res://scripts/snake.gd
+res://scripts/start_screen.gd
+res://scripts/hud.gd
