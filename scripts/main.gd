@@ -260,6 +260,10 @@ func _set_move_interval() -> void:
 	var mult := _speed_multiplier_for_level(_level) if _game_mode == GameMode.CLASSIC else 1.0
 	_move_timer.wait_time = base_interval * (1.0 / mult)
 
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and event.keycode == KEY_R and _is_game_over:
+		_on_restart_requested()
+
 func _draw() -> void:
 	draw_rect(Rect2(GRID_OFFSET, Vector2(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE)), BG_COLOR)
 	for i in range(GRID_SIZE + 1):
