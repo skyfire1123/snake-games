@@ -86,6 +86,4 @@ func hide_game_over() -> void:
 	_set_visible(_game_over_label, false)
 	_set_visible(_restart_hint, false)
 
-func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
-		restart_requested.emit()
+# BUG-005 fix: removed dead _input(event) — restart is handled by restart_requested signal

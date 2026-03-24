@@ -25,12 +25,18 @@ func _ready() -> void:
 	_next_direction = _current_direction
 
 func _input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed:
+	if event is InputEventKey and event.pressed and not event.echo:
 		var new_dir := _get_direction_from_event(event)
 		if new_dir != Vector2i.ZERO:
 			# Prevent 180-degree turns
 			if new_dir != -_current_direction:
 				_next_direction = new_dir
+
+## BUG-005 fix: removed dead _input(event) in CanvasLayer (handled by restart_requested signal)
+
+## BUG-003 fix (continued): clear buffered direction on game start/restart
+func clear_buffer() -> void:
+	_next_direction = _current_direction
 
 ## Called by main.gd on each move tick to get buffered direction
 func get_next_direction() -> Vector2i:

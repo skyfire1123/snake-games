@@ -17,7 +17,7 @@ func _ready() -> void:
 	_collision_shape = $CollisionShape2D
 	_sprite = $Sprite
 
-func spawn(occupied_cells: Array[Vector2i]) -> void:
+func spawn(occupied_cells: Array[Vector2i]) -> bool:
 	# Find a random empty cell
 	var empty_cells: Array[Vector2i] = []
 	for x in range(GRID_SIZE):
@@ -31,6 +31,11 @@ func spawn(occupied_cells: Array[Vector2i]) -> void:
 		_grid_position = empty_cells[random_index]
 		_update_position()
 		food_spawned.emit(_grid_position)
+		return true
+	else:
+		# BUG-004 fix: grid full → game over (emit signal with no position)
+		food_spawned.emit(Vector2i(-1, -1))
+		return false
 
 func _update_position() -> void:
 	position = Vector2(_grid_position.x * CELL_SIZE + CELL_SIZE / 2, 
@@ -40,4 +45,8 @@ func get_grid_position() -> Vector2i:
 	return _grid_position
 
 func _on_area_entered(area: Area2D) -> void:
-	food_eaten.emit()
+	# BUG-002 fix: validate that the collision is from the snake's head area
+	# Only accept collision if the area's parent (Snake node or SnakeContainer) has get_head_position
+	var parent := area.get_parent()
+	if parent and parent.has_method("get_head_position"):
+		food_eaten.emit()

@@ -44,7 +44,7 @@ var _challenge_timer: Timer
 func _ready() -> void:
 	_setup_game()
 
-func start_with_mode(mode: String) -> void:
+func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	match mode:
 		"classic":
 			_game_mode = GameMode.CLASSIC
@@ -52,6 +52,7 @@ func start_with_mode(mode: String) -> void:
 			_game_mode = GameMode.ENDLESS
 		"challenge":
 			_game_mode = GameMode.CHALLENGE
+			_challenge_type = ChallengeType.STEP_LIMIT if challenge_type == "step" else ChallengeType.TIME_LIMIT
 	_setup_game()
 
 func _setup_game() -> void:
@@ -126,7 +127,9 @@ func _spawn_food_for_level() -> void:
 	_spawn_food()
 
 func _spawn_food() -> void:
-	_food.spawn(_occupied_cells)
+	# BUG-004 fix: handle grid full (food.spawn returns false)
+	if not _food.spawn(_occupied_cells):
+		_trigger_game_over()
 
 func _update_occupied_cells() -> void:
 	_occupied_cells = _snake.get_body_positions()
@@ -243,7 +246,12 @@ func _game_mode_name() -> String:
 	match _game_mode:
 		GameMode.CLASSIC:   return "CLASSIC"
 		GameMode.ENDLESS:   return "ENDLESS"
-		GameMode.CHALLENGE: return "CHALLENGE"
+		GameMode.CHALLENGE:
+			# BUG-006 fix: distinguish TIME_LIMIT vs STEP_LIMIT sub-types
+			if _challenge_type == ChallengeType.STEP_LIMIT:
+				return "CHALLENGE-STEP"
+			else:
+				return "CHALLENGE-TIME"
 	return ""
 
 func _set_move_interval() -> void:
