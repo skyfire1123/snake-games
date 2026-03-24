@@ -70,8 +70,9 @@ func _spawn_one_food() -> Node2D:
 func _find_empty_cell() -> Vector2i:
 	var GRID_SIZE := 20
 	var empty_cells: Array[Vector2i] = []
-	for x in range(GRID_SIZE):
-		for y in range(GRID_SIZE):
+	# 只在内部区域生成食物（1-18），避开边缘，避免食物出现在边框上
+	for x in range(1, GRID_SIZE - 1):
+		for y in range(1, GRID_SIZE - 1):
 			var cell := Vector2i(x, y)
 			if not cell in _occupied_cells:
 				empty_cells.append(cell)
