@@ -112,14 +112,15 @@ func _process(delta: float) -> void:
 			_double_points_timer = 0
 			is_double_points = false
 
-	# Phase 4: Update HUD power-up indicators
-	_hud.update_powerup_indicators(
-		has_shield,
-		_ghost_timer,
-		_magnet_timer,
-		_double_points_timer,
-		_slow_timer
-	)
+	# Phase 4: Update HUD power-up indicators (null check for test script edge case)
+	if _hud:
+		_hud.update_powerup_indicators(
+			has_shield,
+			_ghost_timer,
+			_magnet_timer,
+			_double_points_timer,
+			_slow_timer
+		)
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	match mode:
