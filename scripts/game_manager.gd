@@ -12,8 +12,8 @@ func _ready() -> void:
 	add_child(_start_screen)
 	_start_screen.mode_selected.connect(_on_mode_selected)
 
-func _on_mode_selected(mode: String) -> void:
+func _on_mode_selected(mode: String, challenge_type: String = "time") -> void:
 	_start_screen.queue_free()
 	var main: Node2D = _main_scene.instantiate()
 	add_child(main)
-	main.start_with_mode(mode)
+	main.start_with_mode(mode, challenge_type)
