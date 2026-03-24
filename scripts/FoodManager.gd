@@ -80,6 +80,7 @@ func spawn_one_food() -> void:
 	if food:
 		_active_foods.append(food)
 		add_child(food)
+		DebugLog.log_msg("SPAWN_FOOD: type=%d active=%d" % [ftype, _active_foods.size()], "FOOD")
 
 func _instantiate_food(ftype: FoodType) -> Node2D:
 	var instance: Node2D = _food_scene.instantiate()

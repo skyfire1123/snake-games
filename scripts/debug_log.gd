@@ -11,29 +11,30 @@ func _ready() -> void:
 	if not DEBUG_MODE:
 		return
 	# 清空上次日志
-	var f := FileAccess.open(LOG_FILE, FileAccess.WRITE)
+	var f := FileAccess.open(LOG_FILE, FileAccess.WRITE_READ)
 	if f:
 		f.store_string("")
 		f.close()
-	log("=== 游戏启动 ===")
 
-func log(msg: String, category: String = "general") -> void:
+func log_msg(msg: String, category: String = "general") -> void:
 	if not DEBUG_MODE:
 		return
 	var timestamp := Time.get_datetime_string_from_system()
 	var line := "[%s] [%s] %s" % [timestamp, category, msg]
 	print(line)
-	var file := FileAccess.open(LOG_FILE, FileAccess.APPEND)
-	if file:
-		file.store_line(line)
-		file.close()
+	# 写入文件（追加模式用 READ_WRITE + seek_end）
+	var f := FileAccess.open(LOG_FILE, FileAccess.READ_WRITE)
+	if f:
+		f.seek_end()
+		f.store_line(line)
+		f.close()
 
-func warn(msg: String) -> void:
+func warn_msg(msg: String, category: String = "WARN") -> void:
 	if not DEBUG_MODE:
 		return
-	log("⚠️ " + msg, "WARN")
+	log_msg("⚠️ " + msg, category)
 
-func error(msg: String) -> void:
+func error_msg(msg: String, category: String = "ERROR") -> void:
 	if not DEBUG_MODE:
 		return
-	log("❌ " + msg, "ERROR")
+	log_msg("❌ " + msg, category)

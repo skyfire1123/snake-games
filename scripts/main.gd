@@ -123,6 +123,7 @@ func _process(delta: float) -> void:
 		)
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
+	DebugLog.log_msg("游戏开始: mode=%s challenge=%s" % [mode, challenge_type], "GAME")
 	match mode:
 		"classic":
 			_game_mode = GameMode.CLASSIC
@@ -134,6 +135,7 @@ func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	_setup_game()
 
 func _setup_game() -> void:
+	DebugLog.log_msg("初始化游戏...", "SETUP")
 	_snake = $Snake
 	_food_manager = $FoodManager
 	_hud = $HUD
@@ -290,7 +292,7 @@ func _update_occupied_cells() -> void:
 	_powerup_manager.set_occupied_cells(_occupied_cells)
 
 func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
-	print("FOOD_EATEN: type=%d pos=%s" % [food_type, str(grid_pos)])
+	DebugLog.log_msg("FOOD_EATEN: type=%d pos=%s" % [food_type, str(grid_pos)], "FOOD")
 	var ftype: int = food_type
 	
 	# Score (Phase 4: double points multiplier)
@@ -376,6 +378,7 @@ func _on_move_timer_timeout() -> void:
 	if _is_game_over:
 		return
 
+	DebugLog.log_msg("MOVE: head=%s" % str(_snake.get_head_position()), "MOVE")
 	var new_direction: Vector2i = _input_handler.get_next_direction()
 	var head_pos: Vector2i = _snake.get_head_position()
 	var new_head_pos: Vector2i = head_pos + new_direction
@@ -435,7 +438,7 @@ func _on_move_timer_timeout() -> void:
 			_trigger_game_over()
 
 func _trigger_food_at(pos: Vector2i) -> void:
-	print("_trigger_food_at called: pos=%s" % str(pos))
+	DebugLog.log_msg("_trigger_food_at: pos=%s foods=%d" % [str(pos), _food_manager.get_foods().size()], "FOOD")
 	# Find food at position and trigger eat
 	var foods: Array = _food_manager.get_foods()
 	for f in foods:
@@ -450,7 +453,7 @@ func _trigger_powerup_at(pos: Vector2i) -> void:
 	_powerup_manager.collect_powerup_at_grid(pos)
 
 func _trigger_game_over() -> void:
-	print("GAME_OVER triggered")
+	DebugLog.log_msg("GAME_OVER: score=%d level=%d" % [_score, _level], "GAMEOVER")
 	# Phase 4: shield blocks death once
 	if has_shield:
 		has_shield = false
