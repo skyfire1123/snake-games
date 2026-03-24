@@ -7,7 +7,9 @@ enum FoodType { NORMAL = 0, GOLD = 1, BLUE = 2, BOMB = 3 }  # Match food.gd valu
 signal food_eaten_by_type(food_type: int, grid_pos: Vector2i)
 signal food_expired(food_type: int, grid_pos: Vector2i)
 
-const SPAWN_WEIGHTS := {FoodType.NORMAL: 55, FoodType.GOLD: 25, FoodType.BLUE: 12, FoodType.BOMB: 8}
+const SPAWN_WEIGHTS := [55, 25, 12, 8]  # NORMAL, GOLD, BLUE, BOMB
+
+const POINTS := [10, 25, 15, 5]  # Points per type
 
 var _food_pool: Array[Node2D] = []
 var _occupied_cells: Array[Vector2i] = []
@@ -59,7 +61,7 @@ func _spawn_one_food() -> Node2D:
 		food.queue_free()
 		return food
 	
-	food.spawn(_occupied_cells, ftype as FoodType)
+	food.spawn(_occupied_cells)
 	_occupied_cells.append(empty_pos)
 	_food_pool.append(food)
 	return food
@@ -78,15 +80,15 @@ func _find_empty_cell() -> Vector2i:
 
 func _weighted_random_type() -> int:
 	var total := 0
-	for t in SPAWN_WEIGHTS:
-		total += SPAWN_WEIGHTS[t]
+	for w in SPAWN_WEIGHTS:
+		total += w
 	var r := randi() % total
 	var cumulative := 0
-	for t in SPAWN_WEIGHTS:
-		cumulative += SPAWN_WEIGHTS[t]
+	for i in range(SPAWN_WEIGHTS.size()):
+		cumulative += SPAWN_WEIGHTS[i]
 		if r < cumulative:
-			return t
-	return FoodType.NORMAL
+			return i
+	return 0  # NORMAL
 
 func _on_food_eaten(food: Node2D) -> void:
 	var idx := _food_pool.find(food)
@@ -120,3 +122,8 @@ func _on_food_expired(food: Node2D) -> void:
 	
 	if _replenish_mode or (_food_pool.size() < _pool_size):
 		_spawn_one_food()
+
+func get_points_for_type(ftype: int) -> int:
+	if ftype >= 0 and ftype < POINTS.size():
+		return POINTS[ftype]
+	return 10  # default to NORMAL points
