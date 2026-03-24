@@ -123,7 +123,7 @@ func _setup_game() -> void:
 
 	# Connect FoodManager signals
 	var fm := _food_manager as Node2D
-	if fm.has_method("food_eaten_by_type") and not fm.food_eaten_by_type.is_connected(_on_food_eaten_by_type):
+	if not fm.food_eaten_by_type.is_connected(_on_food_eaten_by_type):
 		fm.food_eaten_by_type.connect(_on_food_eaten_by_type)
 	
 	if not _move_timer.timeout.is_connected(_on_move_timer_timeout):
