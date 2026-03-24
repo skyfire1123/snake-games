@@ -106,7 +106,7 @@ func _create_snake_visuals() -> void:
 	for i in range(_body_positions.size()):
 		var sprite := Sprite2D.new()
 		sprite.texture = _get_texture_for_segment(i)
-		sprite.centered = false
+		sprite.centered = true
 		_snake_container.add_child(sprite)
 		_body_sprites.append(sprite)
 		if i == 0:
@@ -136,7 +136,7 @@ func move_to(new_positions: Array[Vector2i], new_direction: Vector2i) -> void:
 	_body_positions = new_positions
 	while _body_sprites.size() < _body_positions.size():
 		var sprite := Sprite2D.new()
-		sprite.centered = false
+		sprite.centered = true
 		_snake_container.add_child(sprite)
 		_body_sprites.append(sprite)
 		segment_added.emit()
@@ -157,7 +157,7 @@ func grow() -> void:
 		tail_pos = _body_positions[0] + _direction
 	_body_positions.append(tail_pos)
 	var sprite := Sprite2D.new()
-	sprite.centered = false
+	sprite.centered = true
 	_snake_container.add_child(sprite)
 	_body_sprites.append(sprite)
 	_update_segment_position(sprite, tail_pos)
@@ -189,7 +189,7 @@ func shrink_to(new_positions: Array[Vector2i]) -> void:
 	position_updated.emit(_body_positions)
 
 func _update_segment_position(sprite: Sprite2D, grid_pos: Vector2i) -> void:
-	sprite.position = Vector2(grid_pos.x * CELL_SIZE, grid_pos.y * CELL_SIZE) + GRID_OFFSET
+	sprite.position = Vector2(grid_pos.x * CELL_SIZE + CELL_SIZE / 2, grid_pos.y * CELL_SIZE + CELL_SIZE / 2) + GRID_OFFSET
 
 func _get_texture_for_segment(index: int) -> Texture2D:
 	if index == 0:
