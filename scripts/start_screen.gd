@@ -3,6 +3,7 @@ extends Control
 ## Start screen with game mode selection + skin picker — Phase 4 Sprint 4
 
 signal mode_selected(mode: String, challenge_type: String)
+signal theme_requested
 
 var _audio_manager: Node
 var _skin_manager: Node
@@ -22,6 +23,7 @@ func _ready() -> void:
 	$VBoxContainer/ChallengeStepButton.pressed.connect(_on_challenge_step_pressed)
 	$VBoxContainer/SkinRow/PrevSkinButton.pressed.connect(_on_prev_skin)
 	$VBoxContainer/SkinRow/NextSkinButton.pressed.connect(_on_next_skin)
+	$VBoxContainer/ThemeButton.pressed.connect(_on_theme_pressed)
 
 	_audio_manager = get_parent().get_node_or_null("AudioManager")
 	_skin_manager = get_parent().get_node_or_null("SkinManager")

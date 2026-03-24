@@ -6,8 +6,7 @@ const GRID_SIZE := 20
 const CELL_SIZE := 32
 const GRID_OFFSET := Vector2(0, 40)
 
-const BG_COLOR := Color("#1a1a2e")
-const GRID_COLOR := Color("#16213e")
+var _theme_manager: Node
 
 # Game modes
 enum GameMode { CLASSIC, ENDLESS, CHALLENGE }
@@ -140,6 +139,10 @@ func _setup_game() -> void:
 	_input_handler = $InputHandler
 	_particle_system = $ParticleSystem
 	_audio_manager = $AudioManager
+
+	# Theme system
+	_theme_manager = get_node_or_null("/root/ThemeManager")
+	queue_redraw()
 
 	# Phase 4: PowerUpManager
 	if not has_node("PowerUpManager"):
@@ -624,11 +627,16 @@ func _apply_magnet_attraction() -> void:
 						_powerup_manager.set_occupied_cells(_occupied_cells)
 
 func _draw() -> void:
-	draw_rect(Rect2(GRID_OFFSET, Vector2(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE)), BG_COLOR)
+	var bg_color := Color("#1a1a2e")
+	var grid_color := Color("#16213e")
+	if _theme_manager:
+		bg_color = _theme_manager.get_bg_color()
+		grid_color = _theme_manager.get_grid_color()
+	draw_rect(Rect2(GRID_OFFSET, Vector2(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE)), bg_color)
 	for i in range(GRID_SIZE + 1):
 		draw_line(Vector2(i * CELL_SIZE, 0) + GRID_OFFSET,
 				  Vector2(i * CELL_SIZE, GRID_SIZE * CELL_SIZE) + GRID_OFFSET,
-				  GRID_COLOR, 1.0)
+				  grid_color, 1.0)
 		draw_line(Vector2(0, i * CELL_SIZE) + GRID_OFFSET,
 				  Vector2(GRID_SIZE * CELL_SIZE, i * CELL_SIZE) + GRID_OFFSET,
-				  GRID_COLOR, 1.0)
+				  grid_color, 1.0)

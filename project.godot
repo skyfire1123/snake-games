@@ -22,6 +22,10 @@ window/size/viewport_height=720
 window/size/resizable=false
 window/stretch/mode="canvas_items"
 
+[autoload]
+
+ThemeManager="*res://scripts/theme_manager.gd"
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
