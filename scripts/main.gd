@@ -122,7 +122,6 @@ func _process(delta: float) -> void:
 	)
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
-	print("[MAIN] start_with_mode called: ", mode, " ", challenge_type)
 	match mode:
 		"classic":
 			_game_mode = GameMode.CLASSIC
