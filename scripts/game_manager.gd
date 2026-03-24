@@ -39,12 +39,20 @@ func _on_theme_requested() -> void:
 	)
 
 func _on_mode_selected(mode: String, challenge_type: String = "time") -> void:
+	print("[GM] _on_mode_selected called: ", mode, " ", challenge_type)
 	_start_screen.queue_free()
+	print("[GM] start_screen queued")
 	var main: Node2D = _main_scene.instantiate()
+	print("[GM] main instantiated: ", main)
 	add_child(main)
+	print("[GM] main added to tree")
 	# Apply selected skin to snake before game starts
 	var snake: Node2D = main.get_node_or_null("Snake")
+	print("[GM] snake node: ", snake)
 	if snake and _skin_manager:
+		print("[GM] applying skin")
 		_skin_manager.apply_skin_to_snake(snake)
+	print("[GM] calling start_with_mode")
 	main.start_with_mode(mode, challenge_type)
+	print("[GM] start_with_mode done")
 

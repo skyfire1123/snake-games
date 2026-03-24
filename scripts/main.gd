@@ -122,6 +122,7 @@ func _process(delta: float) -> void:
 	)
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
+	print("[MAIN] start_with_mode called: ", mode, " ", challenge_type)
 	match mode:
 		"classic":
 			_game_mode = GameMode.CLASSIC
@@ -416,8 +417,8 @@ func _on_move_timer_timeout() -> void:
 	# Phase 4: magnet attraction — pull nearby food toward snake
 	_apply_magnet_attraction()
 
-	# NOTE: Food collection is handled exclusively by FoodManager's Area2D collision signal.
-	# The manual _trigger_food_at fallback was removed to prevent double-collection.
+	# BUG FIX: Snake has no Area2D collision body, so use grid-position based collision
+	_trigger_food_at(new_head_pos)
 
 	# Phase 4: Check if head is on any power-up position (fallback collision check)
 	var powerup_positions: Array[Vector2i] = _powerup_manager.get_active_positions()
