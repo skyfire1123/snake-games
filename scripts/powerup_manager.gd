@@ -79,16 +79,19 @@ func spawn_powerup(ptype: PowerUpType) -> void:
 	despawn_timer.start()
 
 func _create_powerup_node(ptype: PowerUpType) -> Node2D:
-	# Create a Node2D with a ColorRect placeholder sprite
+	# Create a Node2D with Sprite2D using the actual PNG sprite
 	var node := Node2D.new()
 	node.set_meta("power_type", ptype)
 
-	var cr := ColorRect.new()
-	cr.color = TYPE_COLORS[ptype]
-	var margin := 4.0
-	cr.size = Vector2(_cell_size - margin * 2, _cell_size - margin * 2)
-	cr.position = Vector2(margin, margin)
-	node.add_child(cr)
+	var sprite := Sprite2D.new()
+	sprite.centered = false
+	var sprite_names := ["powerup_shield.png", "powerup_slow.png", "powerup_ghost.png",
+						  "powerup_magnet.png", "powerup_double.png", "powerup_shrink.png"]
+	if ptype >= 0 and ptype < sprite_names.size():
+		var path := "res://assets/sprites/powerups/" + sprite_names[ptype]
+		if ResourceLoader.exists(path):
+			sprite.texture = load(path)
+	node.add_child(sprite)
 
 	# Add an Area2D for collision detection (informational — snake uses ColorRect, not Area2D body)
 	var area := Area2D.new()
