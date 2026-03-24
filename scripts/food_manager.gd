@@ -47,7 +47,7 @@ func _clear_pool() -> void:
 	_food_pool.clear()
 
 func _spawn_one_food() -> Node2D:
-	DebugLog.log("SPAWN_FOOD: pool_size=%d" % _pool_size, "FOOD")
+	print("SPAWN_FOOD: pool_size=%d" % _pool_size, "FOOD"))
 	var food: Node2D = _food_scene.instantiate()
 	add_child(food)
 	
@@ -92,7 +92,7 @@ func _weighted_random_type() -> int:
 	return 0  # NORMAL
 
 func _on_food_eaten(food: Node2D) -> void:
-	DebugLog.log("_on_food_eaten called", "FOOD")
+	print("_on_food_eaten called", "FOOD"))
 	var idx := _food_pool.find(food)
 	if idx == -1:
 		return

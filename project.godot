@@ -24,7 +24,6 @@ window/stretch/mode="canvas_items"
 
 [autoload]
 
-DebugLog="*res://scripts/debug_log.gd"
 ThemeManager="*res://scripts/theme_manager.gd"
 
 [rendering]

@@ -289,7 +289,7 @@ func _update_occupied_cells() -> void:
 	_powerup_manager.set_occupied_cells(_occupied_cells)
 
 func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
-	DebugLog.log("FOOD_EATEN: type=%d pos=%s" % [food_type, str(grid_pos)], "FOOD")
+	print("FOOD_EATEN: type=%d pos=%s" % [food_type, str(grid_pos)])
 	var ftype: int = food_type
 	
 	# Score (Phase 4: double points multiplier)
@@ -416,7 +416,7 @@ func _on_move_timer_timeout() -> void:
 
 	# Phase 4: magnet attraction — pull nearby food toward snake
 	_apply_magnet_attraction()
-	DebugLog.log("MOVE: head=%s foods_on_screen=%d" % [str(new_head_pos), _food_manager.get_foods().size()], "MOVE")
+	print("MOVE: head=%s foods_on_screen=%d" % [str(new_head_pos), _food_manager.get_foods().size()])
 
 	# BUG FIX: Snake has no Area2D collision body, so use grid-position based collision
 	_trigger_food_at(new_head_pos)
@@ -434,7 +434,7 @@ func _on_move_timer_timeout() -> void:
 			_trigger_game_over()
 
 func _trigger_food_at(pos: Vector2i) -> void:
-	DebugLog.log("_trigger_food_at called: pos=%s" % str(pos), "FOOD")
+	print("_trigger_food_at called: pos=%s" % str(pos))
 	# Find food at position and trigger eat
 	var foods: Array = _food_manager.get_foods()
 	for f in foods:
@@ -449,7 +449,7 @@ func _trigger_powerup_at(pos: Vector2i) -> void:
 	_powerup_manager.collect_powerup_at_grid(pos)
 
 func _trigger_game_over() -> void:
-	DebugLog.log("GAME_OVER triggered", "GAME")
+	print("GAME_OVER triggered")
 	# Phase 4: shield blocks death once
 	if has_shield:
 		has_shield = false

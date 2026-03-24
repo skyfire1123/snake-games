@@ -15,7 +15,7 @@ func _ready() -> void:
 	if f:
 		f.store_string("")
 		f.close()
-	log("=== 游戏启动 ===", "SYSTEM")
+	log("=== 游戏启动 ===")
 
 func log(msg: String, category: String = "general") -> void:
 	if not DEBUG_MODE:
