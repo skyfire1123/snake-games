@@ -128,6 +128,25 @@ func collect_powerup(powerup_node: Node2D, area: Area2D, ptype: PowerUpType, gri
 	powerup_node.queue_free()
 	power_up_collected.emit(ptype, grid_pos)
 
+# Phase 4 Sprint 2: Collect powerup by grid position directly (snake has no Area2D body)
+func collect_powerup_at_grid(grid_pos: Vector2i) -> void:
+	var target_pu: Node2D = null
+	for pu in _active_powerups:
+		if is_instance_valid(pu) and pu.has_meta("grid_pos"):
+			var pu_pos: Vector2i = pu.get_meta("grid_pos") as Vector2i
+			if pu_pos == grid_pos:
+				target_pu = pu
+				break
+	if target_pu:
+		var ptype_int: int = target_pu.get_meta("power_type") as int
+		var ptype: PowerUpType = ptype_int as PowerUpType
+		var idx := _active_powerups.find(target_pu)
+		if idx >= 0:
+			_active_powerups.remove_at(idx)
+		_occupied_cells.erase(grid_pos)
+		target_pu.queue_free()
+		power_up_collected.emit(ptype, grid_pos)
+
 func _on_powerup_despawn(powerup_node: Node2D, timer: Timer) -> void:
 	if not is_instance_valid(powerup_node):
 		timer.queue_free()

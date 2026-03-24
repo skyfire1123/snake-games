@@ -57,6 +57,7 @@ var _base_move_interval: float = 0.3
 
 # Phase 4: PowerUp system
 var _powerup_manager: Node2D
+var _powerup_visual_layer: Node2D
 var has_shield := false
 var is_ghost := false
 var _ghost_timer := 0.0
@@ -95,6 +96,7 @@ func _process(delta: float) -> void:
 		if _ghost_timer <= 0:
 			_ghost_timer = 0
 			is_ghost = false
+			_snake.set_ghost_mode(false)
 
 	# Phase 4: magnet countdown
 	if _magnet_timer > 0:
@@ -109,6 +111,15 @@ func _process(delta: float) -> void:
 		if _double_points_timer <= 0:
 			_double_points_timer = 0
 			is_double_points = false
+
+	# Phase 4: Update HUD power-up indicators
+	_hud.update_powerup_indicators(
+		has_shield,
+		_ghost_timer,
+		_magnet_timer,
+		_double_points_timer,
+		_slow_timer
+	)
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	match mode:
@@ -143,6 +154,18 @@ func _setup_game() -> void:
 	_powerup_manager.set_occupied_cells(_occupied_cells)
 	if not _powerup_manager.power_up_collected.is_connected(_on_powerup_collected):
 		_powerup_manager.power_up_collected.connect(_on_powerup_collected)
+
+	# Phase 4: PowerUpVisualLayer (visual effects on snake)
+	if not has_node("PowerUpVisualLayer"):
+		var pvl_script := preload("res://scripts/powerup_visual_layer.gd")
+		_powerup_visual_layer = Node2D.new()
+		_powerup_visual_layer.name = "PowerUpVisualLayer"
+		_powerup_visual_layer.set_script(pvl_script)
+		add_child(_powerup_visual_layer)
+		_powerup_visual_layer.set_main_ref(self)
+	else:
+		_powerup_visual_layer = $PowerUpVisualLayer
+		_powerup_visual_layer.set_main_ref(self)
 
 	# Phase 3: get or create camera for shake
 	_camera = get_viewport().get_camera_2d()
@@ -201,6 +224,8 @@ func _start_game() -> void:
 	_hud.hide_game_over()
 	_hud.hide_level_clear()
 	_hud.hide_slow_indicator()
+	_hud.hide_all_powerup_indicators()
+	_snake.set_ghost_mode(false)
 	_update_occupied_cells()
 	_spawn_food_for_level()
 	_update_hud()
@@ -367,6 +392,10 @@ func _on_move_timer_timeout() -> void:
 	_input_handler.set_current_direction(new_direction)
 	_update_occupied_cells()
 	_food_manager.set_occupied_cells(_occupied_cells)
+	_powerup_manager.set_occupied_cells(_occupied_cells)
+
+	# Phase 4: magnet attraction — pull nearby food toward snake
+	_apply_magnet_attraction()
 
 	# Check if head is on any food position
 	var food_positions: Array[Vector2i] = _food_manager.get_active_positions()
@@ -377,6 +406,11 @@ func _on_move_timer_timeout() -> void:
 		# but we trigger it manually as a fallback.
 		_trigger_food_at(new_head_pos)
 
+	# Phase 4: Check if head is on any power-up position (fallback collision check)
+	var powerup_positions: Array[Vector2i] = _powerup_manager.get_active_positions()
+	if new_head_pos in powerup_positions:
+		_trigger_powerup_at(new_head_pos)
+
 	# Challenge step tracking
 	if _game_mode == GameMode.CHALLENGE and _challenge_type == ChallengeType.STEP_LIMIT:
 		_challenge_steps_remaining -= 1
@@ -386,18 +420,28 @@ func _on_move_timer_timeout() -> void:
 
 func _trigger_food_at(pos: Vector2i) -> void:
 	# Find food at position and trigger eat
-	var foods: Array = _food_manager.get_children()
+	var foods: Array = _food_manager.get_foods()
 	for f in foods:
 		if is_instance_valid(f) and f.has_method("get_grid_position"):
 			if f.call("get_grid_position") == pos:
 				f.food_eaten.emit()
 				break
 
+func _trigger_powerup_at(pos: Vector2i) -> void:
+	# Manually trigger powerup collection at this position
+	# (snake has no Area2D collision body, so we bypass the Area2D signal)
+	_powerup_manager.collect_powerup_at_grid(pos)
+
 func _trigger_game_over() -> void:
 	# Phase 4: shield blocks death once
 	if has_shield:
 		has_shield = false
-		_audio_manager.play_eat()  # shield break sound (placeholder)
+		# Shield break visual effect
+		var head_pos: Vector2i = _snake.get_head_position()
+		var head_world_pos := Vector2(head_pos.x * CELL_SIZE + CELL_SIZE / 2,
+									  head_pos.y * CELL_SIZE + CELL_SIZE / 2) + GRID_OFFSET
+		_particle_system.spawn_shield_break_effect(head_world_pos)
+		_audio_manager.play_eat()
 		return  # Don't end game
 	_is_game_over = true
 	_move_timer.stop()
@@ -435,6 +479,7 @@ func _on_powerup_collected(ptype: int, grid_pos: Vector2i) -> void:
 		2:  # GHOST
 			is_ghost = true
 			_ghost_timer = GHOST_DURATION
+			_snake.set_ghost_mode(true)
 			_audio_manager.play_eat()
 		3:  # MAGNET
 			is_magnet = true
@@ -449,6 +494,11 @@ func _on_powerup_collected(ptype: int, grid_pos: Vector2i) -> void:
 			var min_length := 3
 			var shrink_count := mini(3, positions.size() - min_length)
 			if shrink_count > 0:
+				# Shrink particle at tail position (last segment being removed)
+				var tail_idx := positions.size() - 1
+				var tail_world_pos := Vector2(positions[tail_idx].x * CELL_SIZE + CELL_SIZE / 2,
+											 positions[tail_idx].y * CELL_SIZE + CELL_SIZE / 2) + GRID_OFFSET
+				_particle_system.spawn_shrink_effect(tail_world_pos)
 				var new_positions := positions.slice(0, positions.size() - shrink_count)
 				_snake.shrink_to(new_positions)
 				_update_occupied_cells()
@@ -533,6 +583,51 @@ func _set_move_interval() -> void:
 func _input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.keycode == KEY_R and _is_game_over:
 		_on_restart_requested()
+
+# Phase 4: Helper methods for power-up state queries (used by PowerUpVisualLayer)
+func is_ghost_active() -> bool:
+	return is_ghost
+
+func is_magnet_active() -> bool:
+	return is_magnet
+
+func is_double_points_active() -> bool:
+	return is_double_points
+
+func is_shield_active() -> bool:
+	return has_shield
+
+func is_slow_active() -> bool:
+	return _slow_timer > 0
+
+func get_magnet_radius() -> int:
+	return MAGNET_RADIUS
+
+# Phase 4: Magnet food attraction — called every move tick
+func _apply_magnet_attraction() -> void:
+	if not is_magnet:
+		return
+	var head_pos: Vector2i = _snake.get_head_position()
+	var foods: Array = _food_manager.get_foods()
+	for f in foods:
+		if is_instance_valid(f) and f.has_method("get_grid_position") and f.has_method("set_grid_position"):
+			var food_pos: Vector2i = f.call("get_grid_position")
+			var dist := Vector2i(food_pos - head_pos)
+			if absi(dist.x) <= MAGNET_RADIUS and absi(dist.y) <= MAGNET_RADIUS:
+				# Move food 1 cell per tick toward head
+				var move_dir := Vector2i.ZERO
+				if dist.x != 0 and absi(dist.x) >= absi(dist.y):
+					move_dir = Vector2i(sign(dist.x), 0)
+				elif dist.y != 0:
+					move_dir = Vector2i(0, sign(dist.y))
+				if move_dir != Vector2i.ZERO:
+					var new_food_pos := food_pos + move_dir
+					# Only move if cell is not occupied by snake
+					var body_positions: Array[Vector2i] = _snake.get_body_positions()
+					if not new_food_pos in body_positions:
+						f.call("set_grid_position", new_food_pos)
+						_food_manager.set_occupied_cells(_occupied_cells)
+						_powerup_manager.set_occupied_cells(_occupied_cells)
 
 func _draw() -> void:
 	draw_rect(Rect2(GRID_OFFSET, Vector2(GRID_SIZE * CELL_SIZE, GRID_SIZE * CELL_SIZE)), BG_COLOR)

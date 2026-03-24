@@ -144,6 +144,10 @@ func _update_position() -> void:
 func get_grid_position() -> Vector2i:
 	return _grid_position
 
+func set_grid_position(new_pos: Vector2i) -> void:
+	_grid_position = new_pos
+	_update_position()
+
 func set_food_type(type: int) -> void:
 	_food_type = type as FoodType
 

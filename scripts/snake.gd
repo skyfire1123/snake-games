@@ -39,8 +39,31 @@ var _body_sprites: Array[Sprite2D] = []
 var _head_sprite: Sprite2D
 var _tail_sprite: Sprite2D
 
+# Phase 4: Ghost transparency
+var _ghost_modulate := Color(1.0, 1.0, 1.0, 1.0)
+var _target_ghost_modulate := Color(1.0, 1.0, 1.0, 1.0)
+
 func _ready() -> void:
 	pass  # Container set via setup() by main.gd
+
+func _process(delta: float) -> void:
+	# Phase 4: Smooth ghost transparency lerp
+	if _ghost_modulate != _target_ghost_modulate:
+		_ghost_modulate = _ghost_modulate.lerp(_target_ghost_modulate, delta * 8.0)
+		if absf(_ghost_modulate.a - _target_ghost_modulate.a) < 0.01:
+			_ghost_modulate = _target_ghost_modulate
+		_apply_ghost_modulate()
+
+func set_ghost_mode(active: bool) -> void:
+	if active:
+		_target_ghost_modulate = Color(1.0, 1.0, 1.0, 0.4)
+	else:
+		_target_ghost_modulate = Color(1.0, 1.0, 1.0, 1.0)
+
+func _apply_ghost_modulate() -> void:
+	for sp in _body_sprites:
+		if is_instance_valid(sp):
+			sp.modulate = _ghost_modulate
 
 func setup(container: Node2D) -> void:
 	_snake_container = container

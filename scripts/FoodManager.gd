@@ -42,6 +42,10 @@ var _min_foods: int = 3
 var _max_foods: int = 5
 var _replenish_mode: bool = true  # true = always top up (endless); false = stop at target (classic)
 
+# Direct getter for active foods (more reliable than get_children() for magnet attraction)
+func get_foods() -> Array[Node2D]:
+	return _active_foods
+
 func _ready() -> void:
 	_food_scene = preload("res://scenes/food.tscn")
 

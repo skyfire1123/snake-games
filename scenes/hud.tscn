@@ -163,3 +163,53 @@ theme_override_font_sizes/font_size = 13
 theme_override_styles/normal = SubResource("StyleBoxFlat_bg")
 text = "Press R to Restart"
 horizontal_alignment = 1
+
+[node name="PowerUpHBox" type="HBoxContainer" parent="VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ShieldLabel" type="Label" parent="VBoxContainer/PowerUpHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.4, 0.7, 1.0, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_label")
+text = "🛡️ SHIELD"
+horizontal_alignment = 1
+
+[node name="GhostLabel" type="Label" parent="VBoxContainer/PowerUpHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1.0, 1.0, 1.0, 0.9)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_label")
+text = "👻 GHOST"
+horizontal_alignment = 1
+
+[node name="MagnetLabel" type="Label" parent="VBoxContainer/PowerUpHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1.0, 0.84, 0.0, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_label")
+text = "🧲 MAGNET"
+horizontal_alignment = 1
+
+[node name="DoubleLabel" type="Label" parent="VBoxContainer/PowerUpHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(1.0, 0.27, 0.67, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_label")
+text = "✨ 2X"
+horizontal_alignment = 1
+
+[node name="SlowIndicatorLabel" type="Label" parent="VBoxContainer/PowerUpHBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.3, 0.7, 1.0, 1)
+theme_override_font_sizes/font_size = 11
+theme_override_styles/normal = SubResource("StyleBoxFlat_label")
+text = "🐢 SLOW"
+horizontal_alignment = 1
