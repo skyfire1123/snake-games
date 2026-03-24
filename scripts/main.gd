@@ -55,6 +55,21 @@ const SLOW_DURATION := 3.0
 var _slow_timer: float = 0.0
 var _base_move_interval: float = 0.3
 
+# Phase 4: PowerUp system
+var _powerup_manager: Node2D
+var has_shield := false
+var is_ghost := false
+var _ghost_timer := 0.0
+var is_magnet := false
+var _magnet_timer := 0.0
+var is_double_points := false
+var _double_points_timer := 0.0
+const GHOST_DURATION := 3.0
+const MAGNET_DURATION := 5.0
+const DOUBLE_POINTS_DURATION := 10.0
+const MAGNET_RADIUS := 3
+const POWERUP_DESPAWN_TIME := 8.0
+
 func _ready() -> void:
 	pass
 
@@ -73,6 +88,27 @@ func _process(delta: float) -> void:
 			_slow_timer = 0
 			_apply_speed(false)
 			_hud.hide_slow_indicator()
+
+	# Phase 4: ghost countdown
+	if _ghost_timer > 0:
+		_ghost_timer -= delta
+		if _ghost_timer <= 0:
+			_ghost_timer = 0
+			is_ghost = false
+
+	# Phase 4: magnet countdown
+	if _magnet_timer > 0:
+		_magnet_timer -= delta
+		if _magnet_timer <= 0:
+			_magnet_timer = 0
+			is_magnet = false
+
+	# Phase 4: double points countdown
+	if _double_points_timer > 0:
+		_double_points_timer -= delta
+		if _double_points_timer <= 0:
+			_double_points_timer = 0
+			is_double_points = false
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	match mode:
@@ -93,7 +129,21 @@ func _setup_game() -> void:
 	_input_handler = $InputHandler
 	_particle_system = $ParticleSystem
 	_audio_manager = $AudioManager
-	
+
+	# Phase 4: PowerUpManager
+	if not has_node("PowerUpManager"):
+		var pm_script := preload("res://scripts/powerup_manager.gd")
+		_powerup_manager = Node2D.new()
+		_powerup_manager.name = "PowerUpManager"
+		_powerup_manager.set_script(pm_script)
+		add_child(_powerup_manager)
+	else:
+		_powerup_manager = $PowerUpManager
+	_powerup_manager.clear_all()
+	_powerup_manager.set_occupied_cells(_occupied_cells)
+	if not _powerup_manager.power_up_collected.is_connected(_on_powerup_collected):
+		_powerup_manager.power_up_collected.connect(_on_powerup_collected)
+
 	# Phase 3: get or create camera for shake
 	_camera = get_viewport().get_camera_2d()
 	if _camera:
@@ -141,6 +191,13 @@ func _start_game() -> void:
 	_level = 1
 	_is_game_over = false
 	_slow_timer = 0.0
+	has_shield = false
+	is_ghost = false
+	_ghost_timer = 0.0
+	is_magnet = false
+	_magnet_timer = 0.0
+	is_double_points = false
+	_double_points_timer = 0.0
 	_hud.hide_game_over()
 	_hud.hide_level_clear()
 	_hud.hide_slow_indicator()
@@ -195,12 +252,15 @@ func _spawn_food_for_level() -> void:
 
 func _update_occupied_cells() -> void:
 	_occupied_cells = _snake.get_body_positions()
+	_powerup_manager.set_occupied_cells(_occupied_cells)
 
 func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
 	var ftype: int = food_type
 	
-	# Score
+	# Score (Phase 4: double points multiplier)
 	var pts: int = _food_manager.get_points_for_type(ftype)
+	if is_double_points:
+		pts *= 2
 	_score += pts
 	
 	# Phase 3: slow effect for BLUE food
@@ -218,6 +278,8 @@ func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
 	_snake.grow()
 	_update_occupied_cells()
 	_food_manager.set_occupied_cells(_occupied_cells)
+	_powerup_manager.set_occupied_cells(_occupied_cells)
+	_powerup_manager.on_food_eaten()
 	_update_hud()
 	_set_move_interval()
 
@@ -278,10 +340,15 @@ func _on_move_timer_timeout() -> void:
 		new_head_pos.x = posmod(new_head_pos.x, GRID_SIZE)
 		new_head_pos.y = posmod(new_head_pos.y, GRID_SIZE)
 	else:
-		# Classic / Challenge: wall = death
+		# Classic / Challenge: wall = death (unless ghost mode)
 		if new_head_pos.x < 0 or new_head_pos.x >= GRID_SIZE or new_head_pos.y < 0 or new_head_pos.y >= GRID_SIZE:
-			_trigger_game_over()
-			return
+			if is_ghost:
+				# Wrap in ghost mode too
+				new_head_pos.x = posmod(new_head_pos.x, GRID_SIZE)
+				new_head_pos.y = posmod(new_head_pos.y, GRID_SIZE)
+			else:
+				_trigger_game_over()
+				return
 
 	# Self collision
 	var body_positions: Array[Vector2i] = _snake.get_body_positions()
@@ -327,6 +394,11 @@ func _trigger_food_at(pos: Vector2i) -> void:
 				break
 
 func _trigger_game_over() -> void:
+	# Phase 4: shield blocks death once
+	if has_shield:
+		has_shield = false
+		_audio_manager.play_eat()  # shield break sound (placeholder)
+		return  # Don't end game
 	_is_game_over = true
 	_move_timer.stop()
 	_challenge_timer.stop()
@@ -346,6 +418,50 @@ func _trigger_game_over() -> void:
 	
 	# Phase 3: play death sound
 	_audio_manager.play_death()
+
+func _on_powerup_collected(ptype: int, grid_pos: Vector2i) -> void:
+	# Score multiplier for double points
+	var pts_multiplier := 2 if is_double_points else 1
+	
+	match ptype:
+		0:  # SHIELD
+			has_shield = true
+			_audio_manager.play_eat()
+		1:  # SLOW
+			_slow_timer = SLOW_DURATION
+			_apply_speed(true)
+			_hud.show_slow_indicator(SLOW_DURATION)
+			_audio_manager.play_eat()
+		2:  # GHOST
+			is_ghost = true
+			_ghost_timer = GHOST_DURATION
+			_audio_manager.play_eat()
+		3:  # MAGNET
+			is_magnet = true
+			_magnet_timer = MAGNET_DURATION
+			_audio_manager.play_eat()
+		4:  # DOUBLE_POINTS
+			is_double_points = true
+			_double_points_timer = DOUBLE_POINTS_DURATION
+			_audio_manager.play_eat()
+		5:  # SHRINK
+			var positions: Array[Vector2i] = _snake.get_body_positions()
+			var min_length := 3
+			var shrink_count := mini(3, positions.size() - min_length)
+			if shrink_count > 0:
+				var new_positions := positions.slice(0, positions.size() - shrink_count)
+				_snake.shrink_to(new_positions)
+				_update_occupied_cells()
+				_food_manager.set_occupied_cells(_occupied_cells)
+				_powerup_manager.set_occupied_cells(_occupied_cells)
+			_audio_manager.play_eat()
+	
+	# Particle effect at power-up position
+	var world_pos := Vector2(grid_pos.x * CELL_SIZE + CELL_SIZE / 2,
+							 grid_pos.y * CELL_SIZE + CELL_SIZE / 2) + GRID_OFFSET
+	_particle_system.spawn_eat_effect(world_pos)
+	
+	_update_hud()
 
 func _trigger_screen_shake(intensity: float, duration: float) -> void:
 	_shake_intensity = intensity
