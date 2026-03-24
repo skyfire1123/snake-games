@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 ## HUD — Phase 2: score, length, level, mode, high score, timer/steps
+## Phase 3: food eaten counter, slow effect indicator
 
 signal restart_requested
 
@@ -14,6 +15,8 @@ var _steps_label: Label
 var _game_over_label: Label
 var _restart_hint: Label
 var _level_clear_label: Label
+var _food_label: Label
+var _slow_label: Label
 
 func _ready() -> void:
 	var hbox := $VBoxContainer/HBoxContainer
@@ -24,10 +27,12 @@ func _ready() -> void:
 	_high_score_label = hbox.get_node_or_null("HighScoreLabel")
 	_timer_label      = hbox.get_node_or_null("TimerLabel")
 	_steps_label      = hbox.get_node_or_null("StepsLabel")
+	_food_label       = hbox.get_node_or_null("FoodLabel")
 	var vbox := $VBoxContainer
 	_game_over_label  = vbox.get_node_or_null("GameOverLabel")
 	_restart_hint     = vbox.get_node_or_null("RestartHint")
 	_level_clear_label = vbox.get_node_or_null("LevelClearLabel")
+	_slow_label       = vbox.get_node_or_null("SlowLabel")
 
 	_set_visible(_game_over_label, false)
 	_set_visible(_restart_hint, false)
@@ -35,6 +40,8 @@ func _ready() -> void:
 	_set_visible(_high_score_label, false)
 	_set_visible(_timer_label, false)
 	_set_visible(_steps_label, false)
+	_set_visible(_food_label, false)
+	_set_visible(_slow_label, false)
 
 func _set_visible(node: Node, v: bool) -> void:
 	if node:
@@ -71,6 +78,11 @@ func update_steps(steps: int) -> void:
 		_steps_label.text = "STEPS: %d" % steps
 		_steps_label.visible = true
 
+func update_food_count(eaten: int, target: int) -> void:
+	if _food_label:
+		_food_label.text = "FOOD: %d/%d" % [eaten, target]
+		_food_label.visible = true
+
 func show_level_clear(level: int) -> void:
 	if _level_clear_label:
 		_level_clear_label.text = "LEVEL %d CLEAR!" % level
@@ -87,4 +99,9 @@ func hide_game_over() -> void:
 	_set_visible(_game_over_label, false)
 	_set_visible(_restart_hint, false)
 
-# BUG-005 fix: removed dead _input(event) — restart is handled by restart_requested signal
+func show_slow_indicator(duration: float) -> void:
+	if _slow_label:
+		_slow_label.visible = true
+
+func hide_slow_indicator() -> void:
+	_set_visible(_slow_label, false)

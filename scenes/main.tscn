@@ -6,9 +6,10 @@
 [ext_resource type="Script" path="res://scripts/particle_system.gd" id="4_particle"]
 [ext_resource type="Script" path="res://scripts/audio_manager.gd" id="5_audio"]
 [ext_resource type="Script" path="res://scripts/mobile_input.gd" id="6_mobile"]
-[ext_resource type="PackedScene" uid="uid://food_scene_v1" path="res://scenes/food.tscn" id="7_food"]
-[ext_resource type="PackedScene" uid="uid://hud_scene_v2" path="res://scenes/hud.tscn" id="8_hud"]
-[ext_resource type="Texture2D" path="res://assets/sprites/hud/pause_btn.png" id="9_pause"]
+[ext_resource type="Script" path="res://scripts/FoodManager.gd" id="7_fm"]
+[ext_resource type="PackedScene" uid="uid://food_scene_v1" path="res://scenes/food.tscn" id="8_food"]
+[ext_resource type="PackedScene" uid="uid://hud_scene_v2" path="res://scenes/hud.tscn" id="9_hud"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hud/pause_btn.png" id="10_pause"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.102, 0.102, 0.18, 1)
@@ -37,9 +38,10 @@ script = ExtResource("1_main")
 [node name="Snake" type="Node2D" parent="."]
 script = ExtResource("2_snake")
 
-[node name="Food" parent="." instance=ExtResource("7_food")]
+[node name="FoodManager" type="Node2D" parent="."]
+script = ExtResource("7_fm")
 
-[node name="HUD" parent="." instance=ExtResource("8_hud")]
+[node name="HUD" parent="." instance=ExtResource("9_hud")]
 
 [node name="InputHandler" type="Node2D" parent="."]
 script = ExtResource("3_input")
@@ -105,4 +107,4 @@ offset_top = 50.0
 offset_right = -10.0
 offset_bottom = 10.0
 grow_horizontal = 0
-texture_normal = ExtResource("9_pause")
+texture_normal = ExtResource("10_pause")
