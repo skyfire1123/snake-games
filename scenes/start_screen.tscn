@@ -44,15 +44,15 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -120.0
-offset_top = -160.0
+offset_top = -200.0
 offset_right = 120.0
-offset_bottom = 160.0
+offset_bottom = 200.0
 theme_override_constants/separation = 16
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 1, 0.5, 1)
-theme_override_font_sizes/font_size = 36
+theme_override_font_sizes/font_size = 28
 text = "SNAKE"
 horizontal_alignment = 1
 
@@ -66,41 +66,41 @@ horizontal_alignment = 1
 [node name="ClassicButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "CLASSIC"
 
 [node name="EndlessButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "ENDLESS"
 
 [node name="ChallengeButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "CHALLENGE (TIME)"
 
 [node name="ChallengeStepButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 16
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "CHALLENGE (STEP)"
 
 [node name="ThemeButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.8, 0.8, 1, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 14
 theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
 text = "THEMES"
 
 [node name="SkinRow" type="HBoxContainer" parent="VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 alignment = 1
 
 [node name="SkinTitleLabel" type="Label" parent="VBoxContainer/SkinRow"]
