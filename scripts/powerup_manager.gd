@@ -88,9 +88,9 @@ func _create_powerup_node(ptype: PowerUpType) -> Node2D:
 	var sprite_names := ["powerup_shield.png", "powerup_slow.png", "powerup_ghost.png",
 						  "powerup_magnet.png", "powerup_double.png", "powerup_shrink.png"]
 	if ptype >= 0 and ptype < sprite_names.size():
-		var path := "res://assets/sprites/powerups/" + sprite_names[ptype]
+		var path: String = "res://assets/sprites/powerups/" + sprite_names[ptype]
 		if ResourceLoader.exists(path):
-			sprite.texture = load(path)
+			sprite.texture = load(path) as Texture2D
 	node.add_child(sprite)
 
 	# Add an Area2D for collision detection (informational — snake uses ColorRect, not Area2D body)
