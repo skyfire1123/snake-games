@@ -75,3 +75,7 @@ func _on_challenge_time_pressed() -> void:
 func _on_challenge_step_pressed() -> void:
 	_play_click()
 	mode_selected.emit("challenge", "step")
+
+func _on_theme_pressed() -> void:
+	_play_click()
+	theme_requested.emit()
