@@ -153,4 +153,5 @@ func get_active_positions() -> Array[Vector2i]:
 	return positions
 
 func get_points_for_type(ftype: int) -> int:
-	return POINTS.get(ftype, 10)
+	var v = POINTS.get(ftype, 10)
+	return v as int

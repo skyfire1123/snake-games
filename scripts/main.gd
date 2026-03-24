@@ -197,10 +197,10 @@ func _update_occupied_cells() -> void:
 	_occupied_cells = _snake.get_body_positions()
 
 func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
-	var ftype := food_type as int
+	var ftype: int = food_type
 	
 	# Score
-	var pts := _food_manager.get_points_for_type(ftype)
+	var pts: int = _food_manager.get_points_for_type(ftype)
 	_score += pts
 	
 	# Phase 3: slow effect for BLUE food
