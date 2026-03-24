@@ -70,12 +70,12 @@ func spawn_powerup(ptype: PowerUpType) -> void:
 	_active_powerups.append(powerup)
 	_occupied_cells.append(grid_pos)
 
-	# Auto-despawn after LIFETIME_SECONDS
+	# Auto-despawn after LIFETIME_SECONDS (parented to powerup for cleanup)
 	var despawn_timer := Timer.new()
 	despawn_timer.one_shot = true
 	despawn_timer.wait_time = LIFETIME_SECONDS
-	add_child(despawn_timer)
-	despawn_timer.timeout.connect(_on_powerup_despawn.bind(powerup, despawn_timer))
+	powerup.add_child(despawn_timer)
+	despawn_timer.timeout.connect(_on_powerup_despawn.bind(powerup))
 	despawn_timer.start()
 
 func _create_powerup_node(ptype: PowerUpType) -> Node2D:
@@ -90,7 +90,7 @@ func _create_powerup_node(ptype: PowerUpType) -> Node2D:
 	cr.position = Vector2(margin, margin)
 	node.add_child(cr)
 
-	# Add an Area2D for collision detection
+	# Add an Area2D for collision detection (informational — snake uses ColorRect, not Area2D body)
 	var area := Area2D.new()
 	area.set_meta("power_type", ptype)
 	var shape := CircleShape2D.new()
@@ -100,21 +100,11 @@ func _create_powerup_node(ptype: PowerUpType) -> Node2D:
 	area.add_child(cs)
 	node.add_child(area)
 
-	area.body_entered.connect(_on_powerup_body_entered.bind(node, area))
+	# NOTE: Snake uses ColorRect segments (not Area2D physics body), so
+	# area_entered/body_entered signals won't fire on snake segments.
+	# Collection is handled via collect_powerup_at_grid() from main.gd.
 
 	return node
-
-func _on_powerup_body_entered(body: Node2D, powerup_node: Node2D, area: Area2D) -> void:
-	# Only snake head triggers collection
-	if not body.has_method("get_head_position"):
-		return
-
-	var head_pos: Vector2i = body.get_head_position()
-	var ptype: PowerUpType = powerup_node.get_meta("power_type") as PowerUpType
-	var grid_pos: Vector2i = powerup_node.get_meta("grid_pos") as Vector2i
-
-	if head_pos == grid_pos:
-		collect_powerup(powerup_node, area, ptype, grid_pos)
 
 func collect_powerup(powerup_node: Node2D, area: Area2D, ptype: PowerUpType, grid_pos: Vector2i) -> void:
 	if not is_instance_valid(powerup_node):
@@ -128,7 +118,7 @@ func collect_powerup(powerup_node: Node2D, area: Area2D, ptype: PowerUpType, gri
 	powerup_node.queue_free()
 	power_up_collected.emit(ptype, grid_pos)
 
-# Phase 4 Sprint 2: Collect powerup by grid position directly (snake has no Area2D body)
+# Collect powerup by grid position (called from main.gd — snake has no Area2D body)
 func collect_powerup_at_grid(grid_pos: Vector2i) -> void:
 	var target_pu: Node2D = null
 	for pu in _active_powerups:
@@ -147,9 +137,8 @@ func collect_powerup_at_grid(grid_pos: Vector2i) -> void:
 		target_pu.queue_free()
 		power_up_collected.emit(ptype, grid_pos)
 
-func _on_powerup_despawn(powerup_node: Node2D, timer: Timer) -> void:
+func _on_powerup_despawn(powerup_node: Node2D) -> void:
 	if not is_instance_valid(powerup_node):
-		timer.queue_free()
 		return
 
 	var grid_pos: Vector2i = powerup_node.get_meta("grid_pos") as Vector2i
@@ -158,8 +147,8 @@ func _on_powerup_despawn(powerup_node: Node2D, timer: Timer) -> void:
 		_active_powerups.remove_at(idx)
 
 	_occupied_cells.erase(grid_pos)
+	# Timer is a child of powerup_node, freed automatically by queue_free()
 	powerup_node.queue_free()
-	timer.queue_free()
 
 func _find_empty_cell() -> Vector2i:
 	var forbidden: Array[Vector2i] = _occupied_cells.duplicate()

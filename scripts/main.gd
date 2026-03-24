@@ -397,14 +397,8 @@ func _on_move_timer_timeout() -> void:
 	# Phase 4: magnet attraction — pull nearby food toward snake
 	_apply_magnet_attraction()
 
-	# Check if head is on any food position
-	var food_positions: Array[Vector2i] = _food_manager.get_active_positions()
-	if new_head_pos in food_positions:
-		# FoodManager handles the actual eat (via collision), but we need to
-		# ensure the food at this position emits food_eaten.
-		# The collision detection via Area2D should handle it automatically,
-		# but we trigger it manually as a fallback.
-		_trigger_food_at(new_head_pos)
+	# NOTE: Food collection is handled exclusively by FoodManager's Area2D collision signal.
+	# The manual _trigger_food_at fallback was removed to prevent double-collection.
 
 	# Phase 4: Check if head is on any power-up position (fallback collision check)
 	var powerup_positions: Array[Vector2i] = _powerup_manager.get_active_positions()
