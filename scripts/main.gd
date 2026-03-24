@@ -25,6 +25,7 @@ var _input_handler: Node2D
 var _particle_system: Node2D
 var _audio_manager: Node
 var _camera: Camera2D
+var _skin_manager: Node  # BUG-P4-003: reference for unlock notifications
 
 var _score := 0
 var _high_score := 0
@@ -210,6 +211,11 @@ func _setup_game() -> void:
 	_snake.setup($SnakeContainer)
 	_snake.initialize(Vector2i(10, 10), Vector2i(1, 0), 3)
 
+	# BUG-P4-003: Get SkinManager reference for unlock notifications
+	_skin_manager = get_tree().get_first_node_in_group("skin_manager")
+	if _skin_manager == null:
+		_skin_manager = get_parent().get_node_or_null("SkinManager")
+
 	_start_game()
 
 func _start_game() -> void:
@@ -305,6 +311,12 @@ func _on_food_eaten_by_type(food_type: int, grid_pos: Vector2i) -> void:
 	
 	_snake.grow()
 	_update_occupied_cells()
+
+	# BUG-P4-003: Update skin unlock stats
+	if _skin_manager:
+		_skin_manager.notify_food_eaten()
+		_skin_manager.notify_score_changed(_score)
+		_skin_manager.notify_length_changed(_snake.get_body_positions().size())
 	_food_manager.set_occupied_cells(_occupied_cells)
 	_powerup_manager.set_occupied_cells(_occupied_cells)
 	_powerup_manager.on_food_eaten()
@@ -333,8 +345,8 @@ func _apply_speed(slowed: bool) -> void:
 	var interval := base_interval * (1.0 / mult)
 	
 	if slowed:
-		interval *= 1.43  # 30% slower
-	
+		interval *= 2.0  # 50% slower (BUG-P4-002)
+
 	_base_move_interval = interval
 	_move_timer.wait_time = interval
 
@@ -342,6 +354,10 @@ func _trigger_level_clear() -> void:
 	_move_timer.stop()
 	_hud.show_level_clear(_level)
 	_audio_manager.play_level_clear()
+	# BUG-P4-003: Track level clear for skin unlock
+	if _skin_manager:
+		_skin_manager.notify_level_cleared()
+		_skin_manager.notify_score_changed(_score)
 	_level_clear_timer.start()
 
 func _on_level_clear_timer_timeout() -> void:
@@ -459,6 +475,10 @@ func _trigger_game_over() -> void:
 	
 	# Phase 3: play death sound
 	_audio_manager.play_death()
+	
+	# BUG-P4-003: Update skin unlock stats
+	if _skin_manager:
+		_skin_manager.notify_score_changed(_score)
 
 func _on_powerup_collected(ptype: int, grid_pos: Vector2i) -> void:
 	# Score multiplier for double points
@@ -531,6 +551,10 @@ func _on_restart_requested() -> void:
 		_reset_camera()
 		_snake.setup($SnakeContainer)
 		_snake.initialize(Vector2i(10, 10), Vector2i(1, 0), 3)
+		# BUG-P4-001: Re-apply skin after reinitializing snake visuals
+		var skin_manager := get_parent().get_node_or_null("SkinManager")
+		if skin_manager:
+			skin_manager.apply_skin_to_snake(_snake)
 		_start_game()
 
 func _on_challenge_timer_tick() -> void:
@@ -572,7 +596,7 @@ func _set_move_interval() -> void:
 	var interval := base_interval * (1.0 / mult)
 	
 	if _slow_timer > 0:
-		interval *= 1.43  # 30% slower
+		interval *= 2.0  # 50% slower (BUG-P4-002)
 	
 	_base_move_interval = interval
 	_move_timer.wait_time = interval
