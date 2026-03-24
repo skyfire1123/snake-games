@@ -1,4 +1,4 @@
-[gd_scene load_steps=3 format=3 uid="uid://bx7v8qmh3gklu"]
+[gd_scene load_steps=3 format=3 uid="uid://food_scene_v1"]
 
 [ext_resource type="Script" path="res://scripts/food.gd" id="1_food"]
 

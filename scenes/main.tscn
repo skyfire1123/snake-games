@@ -1,10 +1,10 @@
-[gd_scene load_steps=7 format=3 uid="uid://bx7v8qmh3gklu"]
+[gd_scene load_steps=7 format=3 uid="uid://main_scene_v2"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/snake.gd" id="2_snake"]
 [ext_resource type="Script" path="res://scripts/input_handler.gd" id="3_input"]
-[ext_resource type="PackedScene" uid="uid://food_scene" path="res://scenes/food.tscn" id="4_food"]
-[ext_resource type="PackedScene" uid="uid://hud_scene" path="res://scenes/hud.tscn" id="5_hud"]
+[ext_resource type="PackedScene" uid="uid://food_scene_v1" path="res://scenes/food.tscn" id="4_food"]
+[ext_resource type="PackedScene" uid="uid://hud_scene_v2" path="res://scenes/hud.tscn" id="5_hud"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.102, 0.102, 0.18, 1)

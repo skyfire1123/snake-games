@@ -1,0 +1,73 @@
+[gd_scene load_steps=3 format=3 uid="uid://start_screen"]
+
+[ext_resource type="Script" path="res://scripts/start_screen.gd" id="1_ss"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_btn"]
+bg_color = Color(0.12, 0.18, 0.35, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.3, 0.5, 1, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[node name="StartScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_ss")
+
+[node name="Background" type="ColorRect" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.102, 0.102, 0.18, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -120.0
+offset_top = -140.0
+offset_right = 120.0
+offset_bottom = 140.0
+theme_override_constants/separation = 20
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.5, 1)
+theme_override_font_sizes/font_size = 36
+text = "SNAKE"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.7, 0.7, 0.9, 1)
+theme_override_font_sizes/font_size = 14
+text = "Select Game Mode"
+horizontal_alignment = 1
+
+[node name="ClassicButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "CLASSIC"
+
+[node name="EndlessButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "ENDLESS"
+
+[node name="ChallengeButton" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_btn")
+text = "CHALLENGE"
