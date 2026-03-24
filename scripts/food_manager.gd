@@ -125,6 +125,9 @@ func _on_food_expired(food: Node2D) -> void:
 	if _replenish_mode or (_food_pool.size() < _pool_size):
 		_spawn_one_food()
 
+func get_foods() -> Array[Node2D]:
+	return _food_pool
+
 func get_points_for_type(ftype: int) -> int:
 	if ftype >= 0 and ftype < POINTS.size():
 		return POINTS[ftype]
