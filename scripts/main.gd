@@ -51,7 +51,7 @@ var _shake_intensity := 0.0
 var _original_camera_offset := Vector2.ZERO
 
 # Phase 3: slow effect
-const SLOW_DURATION := 3.0
+const SLOW_DURATION := 5.0
 var _slow_timer: float = 0.0
 var _base_move_interval: float = 0.3
 

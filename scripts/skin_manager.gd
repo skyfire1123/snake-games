@@ -115,8 +115,8 @@ func apply_skin_to_snake(snake: Node) -> void:
 	var textures := get_current_textures()
 	if textures.is_empty():
 		return
-	if snake.has_method("apply_textures"):
-		(snake as Node).apply_textures(textures)
+	if snake.has_method("apply_skin"):
+		(snake as Node).call("apply_skin", textures)
 
 func _save_setting() -> void:
 	var cfg := ConfigFile.new()

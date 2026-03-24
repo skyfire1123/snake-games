@@ -42,6 +42,6 @@ func _on_mode_selected(mode: String, challenge_type: String = "time") -> void:
 	# Apply selected skin to snake before game starts
 	var snake: Node2D = main.get_node_or_null("Snake")
 	if snake and _skin_manager:
-		snake.apply_skin(_skin_manager.get_current_textures())
+		_skin_manager.apply_skin_to_snake(snake)
 	main.start_with_mode(mode, challenge_type)
 
