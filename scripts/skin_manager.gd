@@ -100,9 +100,9 @@ func get_textures(skin_name: String) -> Dictionary:
 	var textures: Dictionary = {}
 	var base := "res://assets/sprites/skins/" + skin_name + "/"
 	for key in TEXTURE_KEYS:
-		var path := base + key + ".png"
+		var path: String = "%s%s.png" % [base, key]
 		if ResourceLoader.exists(path):
-			textures[key] = load(path)
+			textures[key as String] = load(path)
 	_cache[skin_name] = textures
 	return textures
 

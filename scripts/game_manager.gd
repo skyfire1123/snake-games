@@ -26,6 +26,9 @@ func _show_start_screen() -> void:
 	_start_screen.mode_selected.connect(_on_mode_selected)
 	_start_screen.theme_requested.connect(_on_theme_requested)
 
+## BUG FIX: _on_mode_selected 和 _on_theme_requested 中的 queue_free()
+## 现在使用实例变量 self._start_screen 正确引用节点
+
 func _on_theme_requested() -> void:
 	_start_screen.queue_free()
 	var ts: Node = _theme_screen_scene.instantiate()

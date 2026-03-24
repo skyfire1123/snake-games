@@ -37,7 +37,7 @@ func _play_click() -> void:
 func _refresh_skin_label() -> void:
 	if not _skin_manager:
 		return
-	var skin_name := _skin_manager.get_current_skin()
+	var skin_name: String = _skin_manager.get_current_skin()
 	$VBoxContainer/SkinRow/SkinLabel.text = SKIN_LABELS.get(skin_name, skin_name)
 
 func _on_prev_skin() -> void:

@@ -182,10 +182,10 @@ func get_head_sprite() -> Sprite2D:
 func shrink_to(new_positions: Array[Vector2i]) -> void:
 	_body_positions = new_positions
 	while _body_sprites.size() > _body_positions.size():
-		var last := _body_sprites.pop_back()
+		var last: Sprite2D = _body_sprites.pop_back() as Sprite2D
 		if is_instance_valid(last):
 			last.queue_free()
-	_tail_sprite = _body_sprites[_body_sprites.size() - 1] if _body_sprites.size() > 0 else null
+	_tail_sprite = _body_sprites[_body_sprites.size() - 1] as Sprite2D if _body_sprites.size() > 0 else null
 	position_updated.emit(_body_positions)
 
 func _update_segment_position(sprite: Sprite2D, grid_pos: Vector2i) -> void:
