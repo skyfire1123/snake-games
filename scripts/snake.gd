@@ -39,6 +39,7 @@ func _load_default_skin() -> void:
 	}
 	_body_textures = {
 		Vector2i(0, 1):   load(base + "snake_body_vertical.png"),
+		Vector2i(0, -1):  load(base + "snake_body_vertical.png"),  # up → same vertical texture
 		Vector2i(1, 0):   load(base + "snake_body_horizontal.png"),
 		Vector2i(1, -1):  load(base + "snake_body_down_right.png"),
 		Vector2i(-1, -1): load(base + "snake_body_down_left.png"),
@@ -62,6 +63,7 @@ func apply_skin(textures: Dictionary) -> void:
 	}
 	_body_textures = {
 		Vector2i(0, 1):   textures.get("snake_body_vertical"),
+		Vector2i(0, -1):  textures.get("snake_body_vertical"),  # up → same vertical texture
 		Vector2i(1, 0):   textures.get("snake_body_horizontal"),
 		Vector2i(1, -1):  textures.get("snake_body_down_right"),
 		Vector2i(-1, -1): textures.get("snake_body_down_left"),
