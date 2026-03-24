@@ -1,13 +1,31 @@
-[gd_scene load_steps=7 format=3 uid="uid://main_scene_v2"]
+[gd_scene load_steps=11 format=3 uid="uid://main_scene_v2"]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
 [ext_resource type="Script" path="res://scripts/snake.gd" id="2_snake"]
 [ext_resource type="Script" path="res://scripts/input_handler.gd" id="3_input"]
-[ext_resource type="PackedScene" uid="uid://food_scene_v1" path="res://scenes/food.tscn" id="4_food"]
-[ext_resource type="PackedScene" uid="uid://hud_scene_v2" path="res://scenes/hud.tscn" id="5_hud"]
+[ext_resource type="Script" path="res://scripts/particle_system.gd" id="4_particle"]
+[ext_resource type="Script" path="res://scripts/audio_manager.gd" id="5_audio"]
+[ext_resource type="Script" path="res://scripts/mobile_input.gd" id="6_mobile"]
+[ext_resource type="PackedScene" uid="uid://food_scene_v1" path="res://scenes/food.tscn" id="7_food"]
+[ext_resource type="PackedScene" uid="uid://hud_scene_v2" path="res://scenes/hud.tscn" id="8_hud"]
+[ext_resource type="Texture2D" path="res://assets/sprites/hud/pause_btn.png" id="9_pause"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bg"]
 bg_color = Color(0.102, 0.102, 0.18, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_joystick"]
+bg_color = Color(0.2, 0.2, 0.35, 0.5)
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_joystick_inner"]
+bg_color = Color(0.4, 0.6, 1.0, 0.7)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
 
 [node name="main" type="Node2D"]
 script = ExtResource("1_main")
@@ -19,13 +37,72 @@ script = ExtResource("1_main")
 [node name="Snake" type="Node2D" parent="."]
 script = ExtResource("2_snake")
 
-[node name="Food" parent="." instance=ExtResource("4_food")]
+[node name="Food" parent="." instance=ExtResource("7_food")]
 
-[node name="HUD" parent="." instance=ExtResource("5_hud")]
+[node name="HUD" parent="." instance=ExtResource("8_hud")]
 
 [node name="InputHandler" type="Node2D" parent="."]
 script = ExtResource("3_input")
 
+[node name="ParticleSystem" type="Node2D" parent="."]
+script = ExtResource("4_particle")
+
+[node name="AudioManager" type="Node" parent="."]
+script = ExtResource("5_audio")
+
+[node name="MobileInput" type="Node2D" parent="."]
+script = ExtResource("6_mobile")
+
 [node name="MoveTimer" type="Timer" parent="."]
 wait_time = 0.3
 one_shot = false
+
+# Phase 3: Virtual Joystick UI for mobile (left side of screen)
+[node name="VirtualJoystick" type="Control" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 20.0
+offset_top = 200.0
+offset_right = 140.0
+offset_bottom = 320.0
+grow_horizontal = 0
+grow_vertical = 0
+
+[node name="JoystickBase" type="Panel" parent="VirtualJoystick"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_joystick")
+
+[node name="JoystickKnob" type="Panel" parent="VirtualJoystick"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_joystick_inner")
+
+# Phase 3: Pause button (top-right)
+[node name="PauseButton" type="TextureButton" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -60.0
+offset_top = 50.0
+offset_right = -10.0
+offset_bottom = 10.0
+grow_horizontal = 0
+texture_normal = ExtResource("9_pause")

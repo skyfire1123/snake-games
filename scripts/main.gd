@@ -1,6 +1,6 @@
 extends Node2D
 
-## Main game controller — Phase 2 (levels, speed, modes)
+## Main game controller — Phase 2 (levels, speed, modes) + Phase 3 (effects, audio)
 
 const GRID_SIZE := 20
 const CELL_SIZE := 32
@@ -23,6 +23,9 @@ var _food: Area2D
 var _hud: CanvasLayer
 var _move_timer: Timer
 var _input_handler: Node2D
+var _particle_system: Node2D
+var _audio_manager: Node
+var _camera: Camera2D
 
 var _score := 0
 var _high_score := 0
@@ -41,8 +44,20 @@ var _challenge_time_remaining := CHALLENGE_TIME_LIMIT
 var _challenge_steps_remaining := CHALLENGE_STEP_LIMIT
 var _challenge_timer: Timer
 
+# Phase 3: screen shake
+var _shake_duration := 0.0
+var _shake_intensity := 0.0
+var _original_camera_offset := Vector2.ZERO
+
 func _ready() -> void:
 	_setup_game()
+
+func _process(delta: float) -> void:
+	# Phase 3: screen shake
+	if _shake_duration > 0:
+		_shake_duration -= delta
+		if _shake_duration <= 0:
+			_reset_camera()
 
 func start_with_mode(mode: String, challenge_type: String = "time") -> void:
 	match mode:
@@ -61,6 +76,13 @@ func _setup_game() -> void:
 	_hud = $HUD
 	_move_timer = $MoveTimer
 	_input_handler = $InputHandler
+	_particle_system = $ParticleSystem
+	_audio_manager = $AudioManager
+	
+	# Phase 3: get or create camera for shake
+	_camera = get_viewport().get_camera_2d()
+	if _camera:
+		_original_camera_offset = _camera.offset
 
 	# Level clear timer (one-shot, shows "LEVEL CLEAR" briefly)
 	if not has_node("LevelClearTimer"):
@@ -136,6 +158,14 @@ func _update_occupied_cells() -> void:
 
 func _on_food_eaten() -> void:
 	_score += 10
+	
+	# Phase 3: spawn eat particles at food position
+	var food_world_pos := _food.position
+	_particle_system.spawn_eat_effect(food_world_pos)
+	
+	# Phase 3: play eat sound
+	_audio_manager.play_eat()
+	
 	_snake.grow()
 	_update_occupied_cells()
 	_update_hud()
@@ -154,6 +184,7 @@ func _on_food_eaten() -> void:
 func _trigger_level_clear() -> void:
 	_move_timer.stop()
 	_hud.show_level_clear(_level)
+	_audio_manager.play_level_clear()
 	_level_clear_timer.start()
 
 func _on_level_clear_timer_timeout() -> void:
@@ -218,9 +249,37 @@ func _trigger_game_over() -> void:
 	_hud.show_game_over()
 	if _game_mode == GameMode.ENDLESS:
 		_hud.update_high_score(_high_score)
+	
+	# Phase 3: spawn death particles at snake head
+	var head_pos := _snake.get_head_position()
+	var head_world_pos := Vector2(head_pos.x * CELL_SIZE + CELL_SIZE / 2, head_pos.y * CELL_SIZE + CELL_SIZE / 2)
+	_particle_system.spawn_death_effect(head_world_pos)
+	
+	# Phase 3: screen shake
+	_trigger_screen_shake(4.0, 0.3)
+	
+	# Phase 3: play death sound
+	_audio_manager.play_death()
+
+func _trigger_screen_shake(intensity: float, duration: float) -> void:
+	_shake_intensity = intensity
+	_shake_duration = duration
+
+func _process_shake() -> void:
+	if _shake_duration > 0 and _camera:
+		var shake_offset := Vector2(
+			randf_range(-_shake_intensity, _shake_intensity),
+			randf_range(-_shake_intensity, _shake_intensity)
+		)
+		_camera.offset = _original_camera_offset + shake_offset
+
+func _reset_camera() -> void:
+	if _camera:
+		_camera.offset = _original_camera_offset
 
 func _on_restart_requested() -> void:
 	if _is_game_over:
+		_reset_camera()
 		_snake.setup($SnakeContainer)
 		_snake.initialize(Vector2i(10, 10), Vector2i(1, 0), 3)
 		_start_game()
